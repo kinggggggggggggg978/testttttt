@@ -1,0 +1,188 @@
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { DollarSign, Target, TrendingUp, Calendar, Clock, ArrowRightLeft } from 'lucide-react';
+
+const TradeInput = () => {
+  const [riskAmount, setRiskAmount] = useState('');
+  const [positionSize, setPositionSize] = useState('');
+  const [calculatedR, setCalculatedR] = useState(null);
+
+  const calculateRiskReward = (entry, sl, tp) => {
+    if (entry && sl && tp) {
+      const risk = Math.abs(entry - sl);
+      const reward = Math.abs(tp - entry);
+      return (reward / risk).toFixed(2);
+    }
+    return null;
+  };
+
+  return (
+    <div className="min-h-screen bg-zinc-900 p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Header */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Trade Entry</h1>
+            <p className="text-gray-400">Log your trade details and analysis</p>
+          </div>
+          <Button className="bg-red-600 hover:bg-red-700">Save Trade</Button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Trade Details */}
+          <Card className="col-span-2 bg-zinc-800 border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white">Trade Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-gray-400">Symbol</label>
+                  <Input placeholder="e.g., AAPL" className="bg-zinc-700 border-gray-600" />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400">Trade Type</label>
+                  <Select>
+                    <SelectTrigger className="bg-zinc-700 border-gray-600">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="scalp">Scalping (≤1h)</SelectItem>
+                      <SelectItem value="day">Day Trade (≤1d)</SelectItem>
+                      <SelectItem value="swing">Swing (1d+)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-gray-400">Entry Price</label>
+                  <Input type="number" placeholder="0.00" className="bg-zinc-700 border-gray-600" />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400">Position Size</label>
+                  <Input type="number" placeholder="0.00" className="bg-zinc-700 border-gray-600" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-gray-400">Stop Loss</label>
+                  <Input type="number" placeholder="0.00" className="bg-zinc-700 border-gray-600" />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400">Take Profit</label>
+                  <Input type="number" placeholder="0.00" className="bg-zinc-700 border-gray-600" />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm text-gray-400">Entry Time</label>
+                  <Input type="datetime-local" className="bg-zinc-700 border-gray-600" />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400">Exit Time</label>
+                  <Input type="datetime-local" className="bg-zinc-700 border-gray-600" />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-400">Strategy</label>
+                <Select>
+                  <SelectTrigger className="bg-zinc-700 border-gray-600">
+                    <SelectValue placeholder="Select strategy" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="breakout">Breakout</SelectItem>
+                    <SelectItem value="pullback">Pullback</SelectItem>
+                    <SelectItem value="trend">Trend Following</SelectItem>
+                    <SelectItem value="reversal">Reversal</SelectItem>
+                    <SelectItem value="support">Support/Resistance</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm text-gray-400">Notes</label>
+                <Textarea 
+                  placeholder="Trade setup, market conditions, emotions..." 
+                  className="bg-zinc-700 border-gray-600 min-h-[100px]"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Risk Calculator */}
+          <div className="space-y-6">
+            <Card className="bg-zinc-800 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white">Risk Calculator</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="text-sm text-gray-400">Account Risk (%)</label>
+                  <Input 
+                    type="number" 
+                    placeholder="1-2% recommended" 
+                    className="bg-zinc-700 border-gray-600"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400">Risk Amount ($)</label>
+                  <Input 
+                    type="number" 
+                    value={riskAmount}
+                    onChange={(e) => setRiskAmount(e.target.value)}
+                    className="bg-zinc-700 border-gray-600"
+                  />
+                </div>
+                <Alert className="bg-red-900/20 border-red-800">
+                  <AlertDescription>
+                    Recommended position size: ${positionSize}
+                  </AlertDescription>
+                </Alert>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-zinc-800 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white">Trade Checklist</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <input type="checkbox" className="accent-red-500" />
+                  <span className="text-gray-300">Checked market conditions</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input type="checkbox" className="accent-red-500" />
+                  <span className="text-gray-300">Confirmed trend direction</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input type="checkbox" className="accent-red-500" />
+                  <span className="text-gray-300">Identified key levels</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input type="checkbox" className="accent-red-500" />
+                  <span className="text-gray-300">Risk matches strategy</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input type="checkbox" className="accent-red-500" />
+                  <span className="text-gray-300">Emotion check</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TradeInput;
